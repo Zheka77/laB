@@ -1,0 +1,161 @@
+// Завдання 1
+// Створення масиву persons з 5 об'єктами
+let persons = [
+    { name: 'Zhenya', age: 20, city: 'Korosten' },
+    { name: 'Andrew', age: 25, city: 'Sumy' },
+    { name: 'Dasha', age: 18, city: 'Chicago' },
+    { name: 'Anna', age: 22, city: 'Kyiv' },
+    { name: 'Sasha', age: 21, city: 'Rivne' }
+];
+
+// Встановлення властивостей масиву
+persons.groupName = 'A';
+persons.teacher = '';
+persons.year = '2023';
+
+// Виведення елементів масиву за допомогою різних версій циклу for
+for (let i = 0; i < persons.length; i++) {
+    console.log(persons[i]);
+}
+
+for (let person of persons) {
+    console.log(person);
+}
+
+persons.forEach(person => console.log(person));
+
+// Виведення властивостей масиву
+console.log("Group Name:", persons.groupName);
+console.log("Teacher:", persons.teacher);
+console.log("Year:", persons.year);
+
+// Завдання 2
+let defaults = {
+    mode: 'test',
+    debugLevel: 'error',
+    logFolder: 'root'
+};
+
+let userSetting = {
+    mode: 'production',
+    debugLevel: 'trace'
+};
+
+// Функція для об'єднання двох об'єктів з пріоритетом для userSetting
+function mergeSettings(defaults, userSetting) {
+    // Спосіб 1: Використання Object.assign
+    let combined1 = Object.assign({}, defaults, userSetting);
+    console.log("Combined1:", combined1);
+
+    // Спосіб 2: Використання спред оператора
+    let combined2 = { ...defaults, ...userSetting };
+    console.log("Combined2:", combined2);
+
+    // Спосіб 3: Використання Object.entries і reduce
+    let combined3 = Object.entries({ ...defaults, ...userSetting }).reduce((acc, [key, value]) => {
+        acc[key] = userSetting.hasOwnProperty(key) ? userSetting[key] : value;
+        return acc;
+    }, {});
+    console.log("Combined3:", combined3);
+
+    return combined3;
+}
+
+mergeSettings(defaults, userSetting);
+
+// Завдання 3
+persons.forEach(person => {
+    Object.defineProperty(person, 'birthYear', {
+        get() {
+            return new Date().getFullYear() - this.age;
+        },
+        configurable: false,
+        enumerable: true
+    });
+});
+
+console.log(persons[0].birthYear);
+
+// Завдання 4
+let array1 = [1, 2, 3];
+let array2 = [4, 5, 6];
+
+// Спосіб 1: Використання спред оператора
+let mergedArray1 = [...array1, ...array2];
+console.log("Merged Array 1:", mergedArray1);
+
+
+// Завдання 5
+let textFragments = persons.map(person => `${person.name} from ${person.city} born in ${new Date().getFullYear() - person.age}`);
+console.log("Text Fragments:", textFragments);
+
+// Завдання 6
+let olderThan20 = persons.filter(person => person.age > 20);
+console.log("Older Than 20:", olderThan20);
+
+// Завдання 7
+// Деструктуризація об'єкта
+let { name, city } = persons[0];
+console.log("Name:", name, "City:", city);
+
+// Деструктуризація першого елемента масиву
+let [firstPerson] = persons;
+console.log("First Person:", firstPerson);
+
+// Завдання 8
+function getUserData(name) {
+    let user = persons.find(person => person.name === name);
+    if (!user) throw new Error('Unable to find user');
+    return user;
+}
+
+function showUserInfo(name) {
+    console.log('Loading');
+    try {
+        let user = getUserData(name);
+        console.log(user);
+        console.log('Loading finished');
+    } catch (error) {
+        console.error(error.message);
+        console.log('Loading finished');
+    }
+}
+
+showUserInfo('John');
+showUserInfo('Alice');
+
+// Завдання 9
+function textToCharArray(text) {
+    return text.split('');
+}
+
+console.log(textToCharArray("Hello"));
+
+// Завдання 10
+function reverseString(text) {
+    return text.split('').reverse().join('');
+}
+
+console.log(reverseString("Hello"));
+
+// Завдання 11
+function isJsFile(filename) {
+    return filename.endsWith('.js');
+}
+
+console.log(isJsFile("script.js"));
+console.log(isJsFile("document.txt"));
+
+// Завдання 12
+function sentenceToWords(sentence) {
+    return sentence.split(' ');
+}
+
+console.log(sentenceToWords("This is a test sentence"));
+
+// Завдання 13
+function replaceWord(text, oldWord, newWord) {
+    return text.replace(new RegExp(oldWord, 'g'), newWord);
+}
+
+console.log(replaceWord("Hello world", "world", "universe"));
