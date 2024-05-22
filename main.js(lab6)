@@ -1,0 +1,166 @@
+// main.js
+document.addEventListener('DOMContentLoaded', init);
+
+function init() {
+    const mainDiv = document.getElementById('main');
+
+    // Create and style header, main, footer
+    const header = document.createElement('header');
+    const main = document.createElement('main');
+    const footer = document.createElement('footer');
+
+    header.style.height = '100px';
+    main.style.height = '500px';
+    footer.style.height = '100px';
+
+    mainDiv.appendChild(header);
+    mainDiv.appendChild(main);
+    mainDiv.appendChild(footer);
+
+    // Create and style leftPanel, content, rightPanel
+    const leftPanel = document.createElement('div');
+    const content = document.createElement('div');
+    const rightPanel = document.createElement('div');
+
+    leftPanel.id = 'leftPanel';
+    content.id = 'content';
+    rightPanel.id = 'rightPanel';
+
+    leftPanel.style.width = '33%';
+    content.style.width = '34%';
+    rightPanel.style.width = '33%';
+
+    leftPanel.classList.add('panel');
+    content.classList.add('panel');
+    rightPanel.classList.add('panel');
+
+    main.appendChild(leftPanel);
+    main.appendChild(content);
+    main.appendChild(rightPanel);
+
+    // Create loader div inside leftPanel, content, rightPanel
+    [leftPanel, content, rightPanel].forEach(panel => {
+        const loader = document.createElement('div');
+        loader.className = 'loader';
+        panel.appendChild(loader);
+    });
+
+    // Create buttons in header
+    const buttons = ['User Rating', 'News', 'Contacts', 'About'];
+    buttons.forEach(btnText => {
+        const button = document.createElement('button');
+        button.textContent = btnText;
+        button.addEventListener('click', () => {
+            content.innerHTML = `<h1>${btnText}</h1>`;
+        });
+        header.appendChild(button);
+    });
+
+    // Create footer sections
+    const currentUsers = document.createElement('div');
+    const newUsers = document.createElement('div');
+
+    currentUsers.id = 'currentUsers';
+    newUsers.id = 'newUsers';
+
+    footer.appendChild(currentUsers);
+    footer.appendChild(newUsers);
+
+    // Hide loader in content after 1 second and show message and button
+    setTimeout(() => {
+        content.innerHTML = '<div>No users</div><button id="getUsers">Get Users</button>';
+        document.getElementById('getUsers').addEventListener('click', fetchUsersHandler);
+    }, 1000);
+}
+
+function fetchUsersHandler() {
+    fetchUsers().then(users => {
+        const content = document.getElementById('content');
+        const table = document.createElement('table');
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Lastname</th>
+                    <th>Firstname</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${users.map(user => `
+                    <tr>
+                        <td>${user.lastname}</td>
+                        <td>${user.firstname}</td>
+                        <td>${user.score}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        `;
+        content.innerHTML = '';
+        content.appendChild(table);
+
+        // Add search and score display
+        setTimeout(() => {
+            addSearchAndScore(users);
+        }, 1000);
+    });
+}
+
+function addSearchAndScore(users) {
+    const leftPanel = document.getElementById('leftPanel');
+    const rightPanel = document.getElementById('rightPanel');
+
+    // Search box
+    const searchBox = document.createElement('input');
+    const searchButton = document.createElement('button');
+    searchButton.textContent = 'Search';
+    searchButton.addEventListener('click', () => {
+        const query = searchBox.value.toLowerCase();
+        document.querySelectorAll('#content table tbody tr').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+        });
+    });
+
+    leftPanel.appendChild(searchBox);
+    leftPanel.appendChild(searchButton);
+
+    // Score display
+    const totalScore = users.reduce((sum, user) => sum + user.score, 0);
+    const scoreDisplay = document.createElement('div');
+    scoreDisplay.textContent = `Total Score: ${totalScore}`;
+    rightPanel.appendChild(scoreDisplay);
+
+    // Edit table checkbox
+    const editCheckbox = document.createElement('input');
+    editCheckbox.type = 'checkbox';
+    editCheckbox.id = 'editTable';
+    const editLabel = document.createElement('label');
+    editLabel.htmlFor = 'editTable';
+    editLabel.textContent = 'Edit table';
+    editCheckbox.addEventListener('change', () => {
+        document.querySelectorAll('#content table tbody tr').forEach(row => {
+            if (editCheckbox.checked) {
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => row.remove());
+                row.appendChild(deleteButton);
+            } else {
+                if (row.lastChild.tagName === 'BUTTON') {
+                    row.removeChild(row.lastChild);
+                }
+            }
+        });
+    });
+
+    rightPanel.appendChild(editCheckbox);
+    rightPanel.appendChild(editLabel);
+}
+
+document.addEventListener('click', (event) => {
+    if (event.target.tagName === 'TH' && event.target.textContent === 'Lastname') {
+        const rowsArray = Array.from(document.querySelectorAll('#content table tbody tr'));
+        rowsArray.sort((a, b) => a.cells[0].textContent.localeCompare(b.cells[0].textContent));
+        const tbody = document.querySelector('#content table tbody');
+        tbody.innerHTML = '';
+        rowsArray.forEach(row => tbody.appendChild(row));
+    }
+});
