@@ -1,0 +1,158 @@
+// Завдання 1
+function average(...args) {
+    const sum = args.reduce((acc, val) => acc + val, 0);
+    return sum / args.length;
+}
+
+console.log(average(1, 2, 3, 4, 5)); // 3
+console.log(average(10, 20, 30));    // 20
+
+// Завдання 2
+function values(f, low, high) {
+    let result = [];
+    for (let i = low; i <= high; i++) {
+        result.push(f(i));
+    }
+    return result;
+}
+
+const square = x => x * x;
+console.log(values(square, 1, 5)); // [1, 4, 9, 16, 25]
+
+// Завдання 3
+function callWithContext(obj, callback) {
+    callback.call(obj);
+}
+
+let person = { name: 'John', age: 30 };
+
+callWithContext(person, function() {
+    const date = new Date().toLocaleDateString();
+    console.log(`Today is ${date}! Happy birthday ${this.name}.`);
+});
+
+// Завдання 4
+function createCounter() {
+    let count = 0;
+    return {
+        increment() {
+            count++;
+        },
+        getValue() {
+            return count;
+        }
+    };
+}
+
+const counter = createCounter();
+counter.increment();
+console.log(counter.getValue()); // 1
+counter.increment();
+console.log(counter.getValue()); // 2
+
+// Завдання 5
+function getGreeting() {
+    let lastCall = {};
+    return function(name) {
+        if (lastCall.name === name) {
+            return lastCall.greeting;
+        }
+        lastCall.name = name;
+        lastCall.greeting = `Hello ${name}`;
+        return lastCall.greeting;
+    };
+}
+
+const greet = getGreeting();
+console.log(greet('John')); // Hello John
+console.log(greet('John')); // Hello John (from cache)
+console.log(greet('Jane')); // Hello Jane
+
+// Завдання 6
+function sumWith(x) {
+    return function(y) {
+        return x + y;
+    };
+}
+
+const addFive = sumWith(5);
+console.log(addFive(10)); // 15
+console.log(addFive(20)); // 25
+
+// Завдання 7
+function createChecker(arr) {
+    return function(text) {
+        return arr.includes(text);
+    };
+}
+
+const checker = createChecker(['apple', 'banana', 'cherry']);
+console.log(checker('apple')); // true
+console.log(checker('grape')); // false
+
+// Завдання 8
+function capitalizeProperty(arr, prop) {
+    return arr.map(obj => ({
+        ...obj,
+        [prop]: obj[prop].charAt(0).toUpperCase() + obj[prop].slice(1)
+    }));
+}
+
+const personsArray = [
+    { name: 'john', age: 23 },
+    { name: 'jane', age: 25 }
+];
+
+console.log(capitalizeProperty(personsArray, 'name'));
+// [{ name: 'John', age: 23 }, { name: 'Jane', age: 25 }]
+
+// Завдання 9
+function greet() {
+    console.log(`Hello, ${this.name}`);
+}
+
+const user = { name: 'Alice' };
+
+// Використання call
+greet.call(user); // Hello, Alice
+
+// Використання apply
+greet.apply(user); // Hello, Alice
+
+// Використання bind
+const boundGreet = greet.bind(user);
+boundGreet(); // Hello, Alice
+
+// Завдання 10
+function logCallback(callback, ...args) {
+    const date = new Date().toLocaleTimeString();
+    console.log(`Function: ${callback.name}, Args: ${args}, Time: ${date}`);
+    return callback(...args);
+}
+
+function exampleFunc(a, b) {
+    return a + b;
+}
+
+console.log(logCallback(exampleFunc, 2, 3)); // Function: exampleFunc, Args: 2,3, Time: current time
+
+// Завдання 11
+function cacheFor10Seconds(callback) {
+    let cache = {};
+    return function(arg) {
+        const now = Date.now();
+        if (cache[arg] && (now - cache[arg].time < 10000)) {
+            console.log('From cache');
+            return cache[arg].result;
+        }
+        const result = callback(arg);
+        cache[arg] = { result, time: now };
+        return result;
+    };
+}
+
+const cachedFunc = cacheFor10Seconds(x => x * 2);
+
+console.log(cachedFunc(5)); // 10
+setTimeout(() => console.log(cachedFunc(5)), 5000); // From cache, 10
+setTimeout(() => console.log(cachedFunc(5)), 11000); // 10 (new calculation)
