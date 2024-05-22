@@ -1,0 +1,109 @@
+// 1. Функція invokeAfterDelay
+
+function invokeAfterDelay(fn, delay) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(fn());
+        }, delay);
+    });
+}
+
+// Демонстрація роботи invokeAfterDelay з випадковим числом від 0 до 10
+invokeAfterDelay(() => Math.floor(Math.random() * 11), 1000).then(result => {
+    console.log(`Random number: ${result}`);
+});
+
+// 2. Функція produceRandomAfterDelay на базі invokeAfterDelay
+
+function produceRandomAfterDelay() {
+    return invokeAfterDelay(() => Math.floor(Math.random() * 11), 1000);
+}
+
+// Виклик двічі produceRandomAfterDelay та друк суми
+Promise.all([produceRandomAfterDelay(), produceRandomAfterDelay()]).then(results => {
+    const sum = results[0] + results[1];
+    console.log(`Sum of random numbers: ${sum}`);
+});
+
+// 3. Функція sleep
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Виклик sleep
+(async () => {
+    console.log('Sleeping for 1 second...');
+    await sleep(1000);
+    console.log('Awake!');
+})();
+
+// 4. Функція getUser
+
+const users = [
+    { id: 0, name: 'Alice', age: 25, city: 'New York' },
+    { id: 1, name: 'Bob', age: 30, city: 'Los Angeles' },
+    { id: 2, name: 'Charlie', age: 35, city: 'Chicago' },
+    { id: 3, name: 'Dave', age: 40, city: 'Houston' }
+];
+
+function getUser(id) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const user = users.find(user => user.id === id);
+            if (user) {
+                resolve(user);
+            } else {
+                reject(new Error('User not found'));
+            }
+        }, 1000);
+    });
+}
+
+// 5. Функція loadUsers
+
+async function loadUsers(ids) {
+    try {
+        const userPromises = ids.map(id => getUser(id));
+        const userResults = await Promise.all(userPromises);
+        return userResults;
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}
+
+// 6. Функція logCall
+
+function logCall(callback) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            callback();
+            console.log(`Current time: ${new Date().toLocaleTimeString()}`);
+            resolve();
+        }, 1000);
+    });
+}
+
+// 4 послідовних виклики logCall
+logCall(() => console.log('Call 1'))
+    .then(() => logCall(() => console.log('Call 2')))
+    .then(() => logCall(() => console.log('Call 3')))
+    .then(() => logCall(() => console.log('Call 4')));
+
+// 7. Функція showUsers
+
+async function showUsers(ids) {
+    console.log('loading');
+    try {
+        const users = await loadUsers(ids);
+        console.log(users);
+    } catch (error) {
+        console.error(error);
+    } finally {
+        console.log('loading finished');
+    }
+}
+
+// Виклик showUsers
+showUsers([0, 1, 2, 3]);
