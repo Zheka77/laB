@@ -1,0 +1,118 @@
+// **1. Створення класу Car з використанням функції конструктора:**
+
+class Car {
+  constructor(brand, model, year) {
+    this.brand = brand;
+    this.model = model;
+    this.year = year;
+  }
+}
+
+// **2. Створення екземпляра Car:**
+
+const car1 = new Car("Toyota", "Camry", 2020);
+console.log(car1.brand); // Виводить: Toyota
+console.log(car1.model); // Виводить: Camry
+console.log(car1.year); // Виводить: 2020
+
+// **3. Створення екземпляра Car за допомогою Object.create():**
+
+const car2 = Object.create(Car.prototype);
+car2.brand = "Honda";
+car2.model = "Accord";
+car2.year = 2022;
+
+console.log(car2.brand); // Виводить: Honda
+console.log(car2.model); // Виводить: Accord
+console.log(car2.year); // Виводить: 2022
+
+// **4. Створення класу Person без використання class:**
+
+function Person(name, surname, birthYear) {
+  this.name = name;
+  this.surname = surname;
+  this.birthYear = birthYear;
+
+  this.getAge = function() {
+    const today = new Date();
+    return today.getFullYear() - this.birthYear;
+  };
+
+  this.getFullName = function() {
+    return `${this.name} ${this.surname}`;
+  };
+}
+
+// **5. Створення екземпляра Person:**
+
+const person1 = new Person("Іван", "Петренко", 1980);
+console.log(person1.getAge()); // Виводить: 44
+console.log(person1.getFullName()); // Виводить: Іван Петренко
+
+// **6. Створення підкласу Employee:**
+
+class Employee extends Person {
+  constructor(name, surname, birthYear, position) {
+    super(name, surname, birthYear);
+    this.position = position;
+  }
+
+  getFullName() {
+    return super.getFullName() + ` (${this.position})`;
+  }
+}
+
+// **7. Створення екземпляра Employee:**
+
+const employee1 = new Employee("Петро", "Сидоренко", 1990, "Менеджер");
+console.log(employee1.getAge()); // Виводить: 34
+console.log(employee1.getFullName()); // Виводить: Петро Сидоренко (Менеджер)
+
+// **8. Метод для порівняння класів об'єктів:**
+
+function isInstanceOf(obj1, obj2Class) {
+  return obj1 instanceof obj2Class;
+}
+
+const person2 = new Person("Олена", "Григоренко", 1985);
+const employee2 = new Employee("Андрій", "Попов", 1995, "Розробник");
+
+console.log(isInstanceOf(person2, Person)); // Виводить: true
+console.log(isInstanceOf(person2, Employee)); // Виводить: false
+console.log(isInstanceOf(employee2, Employee)); // Виводить: true
+
+// **9. Метод для перетворення Person в ObservedPerson:**
+
+function toObservedPerson(person) {
+  let callCount = 0;
+
+  const observedPerson = new class ObservedPerson extends Person {
+    constructor() {
+      super(...arguments);
+    }
+
+    getAge() {
+      callCount++;
+      return super.getAge();
+    }
+
+    getFullName() {
+      callCount++;
+      return super.getFullName();
+    }
+  }(person.name, person.surname, person.birthYear);
+
+  observedPerson.getCallCount = function() {
+    return callCount;
+  };
+
+  return observedPerson;
+}
+
+// **10. Створення екземпляра ObservedPerson:**
+
+const observedPerson1 = toObservedPerson(person1);
+console.log(observedPerson1.getAge()); // Виводить: 44
+console.log(observedPerson1.getFullName()); // Виводить: Іван Петренко
+console.log(observedPerson1.getCallCount()); // Виводить: 2
+
