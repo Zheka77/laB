@@ -1,0 +1,116 @@
+class Person {
+    constructor(firstName, lastName, gender, maritalStatus) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.maritalStatus = maritalStatus;
+    }
+
+    toLocaleString(locale) {
+        const titles = {
+            'en-US': {
+                male: 'Mr.',
+                female: this.maritalStatus === 'married' ? 'Mrs.' : 'Ms.'
+            },
+            'de-DE': {
+                male: 'Herr',
+                female: this.maritalStatus === 'married' ? 'Frau' : 'Fräulein'
+            },
+            'fr-FR': {
+                male: 'M.',
+                female: this.maritalStatus === 'married' ? 'Mme' : 'Mlle'
+            }
+        };
+
+        const title = titles[locale] ? titles[locale][this.gender] : this.gender === 'male' ? 'Mr.' : 'Ms.';
+        return `${title} ${this.lastName}`;
+    }
+}
+
+// Приклад використання
+const person1 = new Person('John', 'Smith', 'male', 'single');
+console.log(person1.toLocaleString('en-US')); // Mr. Smith
+
+const person2 = new Person('Jane', 'Doe', 'female', 'married');
+console.log(person2.toLocaleString('fr-FR')); // Mme Doe
+
+// Завдання 2: Форматування чисел у різних системах нумерації
+function formatNumber(number) {
+    const english = number.toLocaleString('en-US');
+    const arabic = number.toLocaleString('ar-EG');
+    const thai = number.toLocaleString('th-TH');
+
+    console.log(`English: ${english}`);
+    console.log(`Arabic: ${arabic}`);
+    console.log(`Thai: ${thai}`);
+}
+
+// Приклад використання
+formatNumber(1234567);
+
+// Завдання 3: Форматування дати та часу у різних локалях
+function formatDateAndTime() {
+    const locales = ['fr-FR', 'zh-CN', 'ar-EG', 'th-TH-u-nu-thai'];
+    const now = new Date();
+
+    locales.forEach(locale => {
+        console.log(`Locale: ${locale}`);
+        console.log(new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeStyle: 'long' }).format(now));
+    });
+}
+
+// Приклад використання
+formatDateAndTime();
+
+// Завдання 4: Функція порівняння двох текстових фрагментів відповідно до локалі
+function compareStrings(str1, str2, locale, options = { sensitivity: 'base' }) {
+    return str1.localeCompare(str2, locale, options);
+}
+
+// Приклад використання
+console.log(compareStrings('straße', 'Strasse', 'de-DE')); // 0, бо ігнорується регістр
+
+// Завдання 5: Функція messageFormat для локалізації шаблонних рядків
+function messageFormat(template, locale, ...args) {
+    const templates = {
+        'en-US': template,
+        'fr-FR': 'Il y a {1} messages pour {0}'
+    };
+
+    const localizedTemplate = templates[locale] || template;
+    return localizedTemplate.replace(/{(\d+)}/g, (match, number) => args[number] || match);
+}
+
+// Приклад використання
+console.log(messageFormat('{0} has {1} messages', 'en-US', 'Alice', 5)); // Alice has 5 messages
+console.log(messageFormat('{0} has {1} messages', 'fr-FR', 'Alice', 5)); // Il y a 5 messages pour Alice
+
+// Завдання 6: Клас для відображення розмірів аркуша паперу залежно від локалі
+class PaperSize {
+    constructor(locale) {
+        this.locale = locale;
+        this.sizes = {
+            'ISO 216': {
+                A4: { width: 210, height: 297 },
+                unit: 'mm'
+            },
+            'US': {
+                Letter: { width: 8.5, height: 11 },
+                unit: 'in'
+            }
+        };
+    }
+
+    getSize(sizeName) {
+        const region = ['US', 'CA'].includes(this.locale) ? 'US' : 'ISO 216';
+        const size = this.sizes[region][sizeName];
+        return size ? `${size.width} x ${size.height} ${this.sizes[region].unit}` : 'Unknown size';
+    }
+}
+
+// Приклад використання
+const paper = new PaperSize('en-US');
+console.log(paper.getSize('Letter')); // 8.5 x 11 in
+
+const paper2 = new PaperSize('fr-FR');
+console.log(paper2.getSize('A4'));
